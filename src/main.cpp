@@ -10,7 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include"RenderObject.h"
+#include"graphics/RenderObject.h"
 
 #include"Logging.h"
 
@@ -243,8 +243,8 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
+
 	glfwDestroyWindow(window);
-	uiManager.~UIManager();
 	glfwTerminate();
 	return 0;
 }

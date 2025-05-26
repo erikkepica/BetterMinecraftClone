@@ -2,6 +2,8 @@
 #include<glad/glad.h>
 #include<vector>
 
+#include"Logging.h"
+
 class VertexBufferElement
 {
 public:

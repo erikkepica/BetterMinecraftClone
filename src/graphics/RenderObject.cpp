@@ -1,5 +1,10 @@
 #include"RenderObject.h"
 
+RenderObject::RenderObject(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs)
+{
+	Generate(vertices, indices, attribs);
+}
+
 void RenderObject::Generate(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs)
 {
 	m_VAO.Generate();
@@ -10,6 +15,16 @@ void RenderObject::Generate(std::vector<float> vertices, std::vector<unsigned in
 	VBO::UnBind();
 	VAO::Unbind();
 	EBO::UnBind();
+}
+
+void RenderObject::SetVertices(std::vector<float> vertices)
+{
+	m_VBO.UpdateData(vertices);
+}
+
+void RenderObject::SetIndices(std::vector<unsigned int> indices)
+{
+	m_EBO.UpdateData(indices);
 }
 
 void RenderObject::Draw()

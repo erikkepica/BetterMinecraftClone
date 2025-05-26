@@ -1,5 +1,4 @@
 #pragma once
-#include"Logging.h"
 #include"VertexArrayObject.h"
 #include"VertexBufferObject.h"
 #include"ElementBufferObject.h"
@@ -15,23 +14,14 @@ public:
 	RenderObject()
 	{
 	}
-	RenderObject(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs)
-	{
-		Generate(vertices, indices, attribs);
-	}
+	RenderObject(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs);
 	~RenderObject(){}
 
 	void Generate(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs);
 
-	void SetVertices(std::vector<float> vertices)
-	{
-		m_VBO.UpdateData(vertices);
-	}	
+	void SetVertices(std::vector<float> vertices);
 	
-	void SetIndices(std::vector<unsigned int> indices)
-	{
-		m_EBO.UpdateData(indices);
-	}
+	void SetIndices(std::vector<unsigned int> indices);
 
 	void Draw();
 };

@@ -1,6 +1,7 @@
 #include"UIManager.h"
 #include"Logging.h"
 
+
 void UIManager::Init(GLFWwindow* window)
 {
 	IMGUI_CHECKVERSION();
