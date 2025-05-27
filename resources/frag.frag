@@ -16,7 +16,9 @@ uniform float lightStrength;
 void main()
 {
     // Sample texture color (object's base color)
-    vec3 objectColor = vec3(texture(tex, uv)*col);
+    vec4 base = texture(tex, uv);
+
+    vec3 objectColor = vec3(base*col);
 
     // Ambient lighting
     vec3 ambient = ambientStrength * lightColor;
@@ -31,5 +33,5 @@ void main()
 
     // Combine results
     vec3 result = clamp((ambient + diffuse),0,1.2) * objectColor;
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, base.a);
 }

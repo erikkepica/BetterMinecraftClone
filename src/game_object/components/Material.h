@@ -1,14 +1,16 @@
 #pragma once
+#include"Component.h"
 
-#include"Texture.h"
-#include"ShaderClass.h"
+#include"graphics/Texture.h"
+#include"graphics/ShaderClass.h"
 
 #include <iostream>
 #include <functional>
+#include<memory>
 
 #include"glm/glm.hpp"
 
-class Material
+class Material : public Component
 {
 
 public:
@@ -48,6 +50,11 @@ public:
 			tex.Bind();
 		shader.Use();
 		ConfigureUniforms();
+	}
+
+	virtual void AddDebugToWindow(DebugWindow& win)
+	{
+		win.Push(std::make_unique<ListOpenGLTextureElements>(textures.data(), "Textures", textures.size()));
 	}
 };
 

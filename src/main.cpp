@@ -6,11 +6,10 @@
 
 #include"UIManager.h"
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include"graphics/RenderObject.h"
+#include"game_object/GameObject.h"
 
 #include"Logging.h"
 
@@ -152,10 +151,10 @@ int main()
 	attribs.Push<float>(3);
 
 
-	RenderObject testObj(vertices, indices, attribs);
+	Renderer testObj(vertices, indices, attribs);
 	LitMaterial mat(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::vector<const char*>
 	{
-		RESOURCES_PATH "OldCobble.png"
+		RESOURCES_PATH "Aki.png"
 	});
 
 	float bgColor[]{.7,1,1};
@@ -166,9 +165,8 @@ int main()
 
 	glm::vec4 squareColor(1,1,1,1);
 	bool squareSpin = false;
-	glm::vec3 pos(0,0,-5);
-	glm::vec3 rot(0,0,0);
-	glm::vec3 scale(1,1,1);
+
+	Transform squareTransform;
 
 
 
@@ -187,14 +185,13 @@ int main()
 	DebugWindow squareWindow("Square", ImGuiWindowFlags_None);
 	squareWindow.Push(std::make_unique<Color3Element>(&squareColor[0], "Color"));
 	squareWindow.Push(std::make_unique<BoolElement>(&squareSpin, "Spin"));
-	squareWindow.Push(std::make_unique<DragFloat3ElementInf>(&pos[0], "Pos"));
-	squareWindow.Push(std::make_unique<DragFloat3ElementRange>(&rot[0], "Rot", 0, 360));
-	squareWindow.Push(std::make_unique<DragFloat3ElementInf>(&scale[0], "Scale"));
+	squareTransform.AddDebugToWindow(squareWindow);
+	mat.AddDebugToWindow(squareWindow);
+
 
 
 	uiManager.Push(&enviromentWindow);
 	uiManager.Push(&squareWindow);
-	//uiManager.Push(win3);
 
 
 	bool enable = true;
@@ -207,17 +204,17 @@ int main()
 		glfwGetFramebufferSize(window, &width, &height);
 
 		if(squareSpin)
-			rot.y = 360*sin(glfwGetTime());
+			squareTransform.rotation.y = 360*sin(glfwGetTime());
 
 
 		glm::mat4 model(1);
-		model = glm::rotate(model, glm::radians(rot.x), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0, 1, 0));
-		model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0, 0, 1));
-		model = glm::scale(model, scale);
+		model = glm::rotate(model, glm::radians(squareTransform.rotation.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(squareTransform.rotation.y), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(squareTransform.rotation.z), glm::vec3(0, 0, 1));
+		model = glm::scale(model, squareTransform.scale);
 
 		glm::mat4 view(1);
-		view = glm::translate(view, pos);
+		view = glm::translate(view, squareTransform.position);
 
 		glm::mat4 projection(1);
 		projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.01f, 100.0f);

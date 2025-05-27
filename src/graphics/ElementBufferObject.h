@@ -1,6 +1,7 @@
 #pragma once
 #include<glad/glad.h>
 #include<vector>
+#pragma once
 #include"Logging.h"
 
 class EBO
