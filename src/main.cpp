@@ -151,6 +151,8 @@ int main()
 	attribs.Push<float>(3);
 
 
+	GameObject cube;
+
 	Renderer testObj(vertices, indices, attribs);
 	LitMaterial mat(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::vector<const char*>
 	{
