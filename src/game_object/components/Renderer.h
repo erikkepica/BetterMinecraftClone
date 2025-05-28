@@ -25,6 +25,7 @@ public:
 
 	void Draw();
 
-	virtual void AddDebugToWindow(DebugWindow& win) override { return; }
-
+	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override { return; }
+	static std::string ID() { return "RENDERER"; }
+	virtual std::string GetID() override { return ID(); }
 };

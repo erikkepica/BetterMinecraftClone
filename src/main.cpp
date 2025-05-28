@@ -19,6 +19,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 
+/*
+TODO:
+
+	- Support for multipule of same components on one GameObject( or prohibition )
+	- Abstracting window and application logic away
+	- Putting code from headers to cpps 
+	- Making the game engine a library
+*/
+
+
+
+
 int main()
 {
 #ifdef _WIN32
@@ -152,25 +164,22 @@ int main()
 
 
 	GameObject cube;
+	Renderer renderer;
+	cube.PushComponent(std::make_shared<Renderer>(vertices, indices, attribs));
 
-	Renderer testObj(vertices, indices, attribs);
-	LitMaterial mat(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::vector<const char*>
+
+	cube.PushComponent(std::make_shared<LitMaterial>(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::vector<const char*>
 	{
-		RESOURCES_PATH "Aki.png"
-	});
+		RESOURCES_PATH "OldCobble.png"
+	}));
+
+
 
 	float bgColor[]{.7,1,1};
 	glm::vec3 lightColor(1, 1, 1);
 	glm::vec3 lightDir(1, -1, -1);
 	float ambientStrength = 0.7f;
 	float lightStrength = 0.6f;
-
-	glm::vec4 squareColor(1,1,1,1);
-	bool squareSpin = false;
-
-	Transform squareTransform;
-
-
 
 	UIManager uiManager;
 	uiManager.Init(window);
@@ -185,10 +194,8 @@ int main()
 
 
 	DebugWindow squareWindow("Square", ImGuiWindowFlags_None);
-	squareWindow.Push(std::make_unique<Color3Element>(&squareColor[0], "Color"));
-	squareWindow.Push(std::make_unique<BoolElement>(&squareSpin, "Spin"));
-	squareTransform.AddDebugToWindow(squareWindow);
-	mat.AddDebugToWindow(squareWindow);
+
+	cube.AddDebugToWindow(squareWindow);
 
 
 
@@ -205,18 +212,14 @@ int main()
 
 		glfwGetFramebufferSize(window, &width, &height);
 
-		if(squareSpin)
-			squareTransform.rotation.y = 360*sin(glfwGetTime());
-
-
 		glm::mat4 model(1);
-		model = glm::rotate(model, glm::radians(squareTransform.rotation.x), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(squareTransform.rotation.y), glm::vec3(0, 1, 0));
-		model = glm::rotate(model, glm::radians(squareTransform.rotation.z), glm::vec3(0, 0, 1));
-		model = glm::scale(model, squareTransform.scale);
+		model = glm::rotate(model, glm::radians(cube.GetComponent<Transform>()->rotation.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(cube.GetComponent<Transform>()->rotation.y), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(cube.GetComponent<Transform>()->rotation.z), glm::vec3(0, 0, 1));
+		model = glm::scale(model, cube.GetComponent<Transform>()->scale);
 
 		glm::mat4 view(1);
-		view = glm::translate(view, squareTransform.position);
+		view = glm::translate(view, cube.GetComponent<Transform>()->position);
 
 		glm::mat4 projection(1);
 		projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.01f, 100.0f);
@@ -225,17 +228,9 @@ int main()
 		glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		mat.model = model;
-		mat.view = view;
-		mat.projection = projection;
-		mat.color = squareColor;
-		mat.lightColor = lightColor;
-		mat.lightPos = lightDir;
-		mat.ambientStrength = ambientStrength;
-		mat.lightStrength = lightStrength;
-
-		mat.Use();
-		testObj.Draw();
+		cube.GetComponent<LitMaterial>()->SetupMatricies(model, view, projection);
+		cube.GetComponent<LitMaterial>()->SetupLighting(lightColor, lightDir, lightStrength, ambientStrength);
+		cube.RenderUpdate();
 
 		uiManager.Draw();
 

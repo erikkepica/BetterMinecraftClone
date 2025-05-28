@@ -4,5 +4,6 @@
 class Component
 {
 public:
-	virtual void AddDebugToWindow(DebugWindow& win){}
+	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win){}
+	virtual std::string GetID() { return "NONE"; }
 };

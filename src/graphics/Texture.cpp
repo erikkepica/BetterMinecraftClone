@@ -1,6 +1,8 @@
 #include"Texture.h"
-void Texture::Generate(const char* path)
+void Texture::Generate(std::string path)
 {
+    memcpy(PathBuff, path.c_str(), path.size());
+
     stbi_set_flip_vertically_on_load(true);
 
     glGenTextures(1, &m_ID);
@@ -13,7 +15,7 @@ void Texture::Generate(const char* path)
 
 
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 4);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

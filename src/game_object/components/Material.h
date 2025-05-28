@@ -44,6 +44,13 @@ public:
 		shader.SetMat4("projection", projection);
 	}
 
+	void SetupMatricies(glm::mat4 model_, glm::mat4 view_, glm::mat4 projection_)
+	{
+		model = model_;
+		view = view_;
+		projection = projection_;
+	}
+
 	void Use()
 	{
 		for (auto tex : textures)
@@ -52,10 +59,12 @@ public:
 		ConfigureUniforms();
 	}
 
-	virtual void AddDebugToWindow(DebugWindow& win)
+	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override
 	{
-		win.Push(std::make_unique<ListOpenGLTextureElements>(textures.data(), "Textures", textures.size()));
+		win.push_back(std::make_unique<ListOpenGLTextureElements>(textures.data(), "Textures", textures.size()));
 	}
+	static std::string ID() { return "MATERIAL"; }
+	virtual std::string GetID() override { return ID(); }
 };
 
 
@@ -67,12 +76,20 @@ public:
 		:Material(vertexPath,fragmentPath,texs)
 	{}
 
-	glm::vec4 color;
+	glm::vec4 color = glm::vec4(1);
 	glm::vec3 lightColor;
 	glm::vec3 lightPos;
-	float ambientStrength;
 	float lightStrength;
+	float ambientStrength;
 	
+	void SetupLighting(glm::vec3 lightColor_, glm::vec3 lightPos_, float lightStrength_, float ambientStrength_)
+	{
+		lightColor = lightColor_;
+		lightPos = lightPos_;
+		lightStrength = lightStrength_;
+		ambientStrength = ambientStrength_;
+	}
+
 	virtual void ConfigureUniforms() override
 	{
 		Material::ConfigureUniforms();
@@ -81,5 +98,11 @@ public:
 		shader.SetVec3("lightDir", lightPos);
 		shader.SetFloat("ambientStrength", ambientStrength);
 		shader.SetFloat("lightStrength", lightStrength);
+	}
+
+	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override
+	{
+		win.push_back(std::make_unique<ListOpenGLTextureElements>(textures.data(), "Textures", textures.size()));
+		win.push_back(std::make_unique<Color4Element>(&color[0], "Color"));
 	}
 };

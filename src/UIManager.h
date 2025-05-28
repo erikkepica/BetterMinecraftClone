@@ -30,6 +30,28 @@ private:
 	std::string m_Name;
 };
 
+class HeaderElement : public DebugDrawElement
+{
+private:
+	std::vector<std::unique_ptr<DebugDrawElement>> m_DrawElements;
+public:
+
+	HeaderElement(void* dataPtr, std::string name, std::vector<std::unique_ptr<DebugDrawElement>>& drawElements)
+		: DebugDrawElement(dataPtr, name), m_DrawElements(std::move(drawElements))
+	{}
+	void Draw() override 
+	{
+		if (ImGui::CollapsingHeader(GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			for (int i = 0; i < m_DrawElements.size(); i++)
+			{
+				m_DrawElements[i]->Draw();
+			}
+		}
+	} 
+	void Push(std::unique_ptr<DebugDrawElement> element) { m_DrawElements.push_back(std::move(element)); }
+};
+
 class Color3Element : public DebugDrawElement { public: Color3Element(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::ColorEdit3(GetName().c_str(), (float*)GetDataPtr()); } };
 class Color4Element : public DebugDrawElement { public: Color4Element(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::ColorEdit4(GetName().c_str(), (float*)GetDataPtr()); } };
 
