@@ -10,28 +10,26 @@
 
 #include"glm/glm.hpp"
 
+#include<map>
+
 class Material : public Component
 {
 
 public:
 	Shader shader;
-	std::vector<Texture> textures;
+	std::map<std::string, Texture> textures;
 	Material(){}
-	Material(const char* vertexPath, const char* fragmentPath, std::vector<const char*> texs)
+	Material(const char* vertexPath, const char* fragmentPath, std::map<std::string, Texture> texs)
 	{
 		Generate(vertexPath, fragmentPath, texs);
 	}
 	~Material(){}
 
-	void Generate(const char* vertexPath, const char* fragmentPath, std::vector<const char*> texs)
+	void Generate(const char* vertexPath, const char* fragmentPath, std::map<std::string, Texture> texs)
 	{
 		shader.Generate(vertexPath, fragmentPath);
-		for (auto tex : texs)
-		{
-			textures.push_back({ tex });
-		}
+		textures = texs;
 	}
-
 
 	glm::mat4 model;
 	glm::mat4 view;
@@ -53,15 +51,20 @@ public:
 
 	void Use()
 	{
-		for (auto tex : textures)
-			tex.Bind();
 		shader.Use();
+		int slot = 0;
+		for (auto& [name, tex] : textures)
+		{
+			tex.Bind(slot);
+			shader.SetInt(name, slot);
+			slot++;
+		}
 		ConfigureUniforms();
 	}
 
 	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override
 	{
-		win.push_back(std::make_unique<ListOpenGLTextureElements>(textures.data(), "Textures", textures.size()));
+		win.push_back(std::make_unique<ListOpenGLTextureElements>((void*)&textures, "Textures", textures.size()));
 	}
 	static std::string ID() { return "MATERIAL"; }
 	virtual std::string GetID() override { return ID(); }
@@ -72,7 +75,7 @@ public:
 class LitMaterial : public Material
 {
 public:
-	LitMaterial(const char* vertexPath, const char* fragmentPath, std::vector<const char*> texs)
+	LitMaterial(const char* vertexPath, const char* fragmentPath, std::map<std::string, Texture> texs)
 		:Material(vertexPath,fragmentPath,texs)
 	{}
 
@@ -81,6 +84,12 @@ public:
 	glm::vec3 lightPos;
 	float lightStrength;
 	float ambientStrength;
+	float shininess = 32;
+	float specularStrength = 0.5f;
+	float normalIntensity = 1;
+	float waveStrength = .2;
+	float waveSpeed = .05;
+	float waveSize = 32;
 	
 	void SetupLighting(glm::vec3 lightColor_, glm::vec3 lightPos_, float lightStrength_, float ambientStrength_)
 	{
@@ -98,11 +107,23 @@ public:
 		shader.SetVec3("lightDir", lightPos);
 		shader.SetFloat("ambientStrength", ambientStrength);
 		shader.SetFloat("lightStrength", lightStrength);
+		shader.SetFloat("shininess", shininess);
+		shader.SetFloat("specularStrength", specularStrength);
+		shader.SetFloat("normalIntensity", normalIntensity);
+		shader.SetFloat("waveStrength", waveStrength);
+		shader.SetFloat("waveSpeed", waveSpeed);
+		shader.SetFloat("waveSize", waveSize);
 	}
 
 	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override
 	{
-		win.push_back(std::make_unique<ListOpenGLTextureElements>(textures.data(), "Textures", textures.size()));
+		win.push_back(std::make_unique<ListOpenGLTextureElements>((void*)&textures, "Textures", textures.size()));
 		win.push_back(std::make_unique<Color4Element>(&color[0], "Color"));
+		win.push_back(std::make_unique<DragFloat1ElementInf>(&shininess, "Specular Shininess"));
+		win.push_back(std::make_unique<DragFloat1ElementInf>(&specularStrength, "Specular Strength"));
+		win.push_back(std::make_unique<DragFloat1ElementInf>(&normalIntensity, "Normal Intensity"));
+		win.push_back(std::make_unique<DragFloat1ElementInf>(&waveStrength, "waveStrength"));
+		win.push_back(std::make_unique<DragFloat1ElementInf>(&waveSpeed, "waveSpeed"));
+		win.push_back(std::make_unique<DragFloat1ElementInf>(&waveSize, "waveSize"));
 	}
 };

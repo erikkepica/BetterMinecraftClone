@@ -12,14 +12,7 @@ public:
 	bool normalized;
 	unsigned int offset;
 
-	static unsigned int GetSize(unsigned int type)
-	{
-		switch (type)
-		{
-		case 5126: return 4;
-		}
-		return 0;
-	}
+	static unsigned int GetSize(unsigned int type);
 };
 
 class VertexBufferLayout
@@ -41,14 +34,7 @@ public:
 		m_Stride += count * VertexBufferElement::GetSize(GL_FLOAT);
 	}
 
-	void SetAttributes()
-	{
-		for (int i = 0; i < m_Elements.size(); i++)
-		{
-			GL_CALL_DEBUG(glVertexAttribPointer(i, m_Elements.at(i).count, m_Elements.at(i).type, m_Elements.at(i).normalized, m_Stride, (void*)m_Elements.at(i).offset));
-			glEnableVertexAttribArray(i);
-		}
-	}
+	void SetAttributes();
 };
 
 
@@ -58,40 +44,16 @@ private:
 	unsigned int m_ID;
 	VertexBufferLayout m_Attribs;
 public:
-	VAO()
-		:m_ID(0)
-	{
-	}
+	VAO();
 
-	void DoAttribs(VertexBufferLayout& attribs)
-	{
-		m_Attribs = attribs;
+	void DoAttribs(VertexBufferLayout& attribs);
 
-		m_Attribs.SetAttributes();
-	}
+	~VAO();
 
-	~VAO()
-	{
-		GL_CALL_DEBUG(glDeleteVertexArrays(1, &m_ID));
-	}
+	void Generate();
 
-	void Generate()
-	{
-		GL_CALL_DEBUG(glGenVertexArrays(1, &m_ID));
+	void Bind();
 
-		Bind();
-
-		std::vector<unsigned int> attribSizes{ 3,2,3 };
-	}
-
-	void Bind()
-	{
-		GL_CALL_DEBUG(glBindVertexArray(m_ID));
-	}
-
-	static void Unbind()
-	{
-		GL_CALL_DEBUG(glBindVertexArray(0));
-	}
+	static void Unbind();
 };
 

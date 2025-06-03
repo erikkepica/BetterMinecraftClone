@@ -49,3 +49,70 @@ void DebugWindow::Draw()
 	}
 	ImGui::End();
 }
+
+DebugDrawElement::DebugDrawElement(void* dataPtr, std::string name)
+	:m_DataPtr(dataPtr), m_Name(name)
+{
+}
+
+void DebugDrawElement::Draw()
+{
+	return;
+}
+
+void* DebugDrawElement::GetDataPtr()
+{
+	return m_DataPtr;
+}
+
+std::string DebugDrawElement::GetName()
+{
+	return m_Name;
+}
+
+HeaderElement::HeaderElement(void* dataPtr, std::string name, std::vector<std::unique_ptr<DebugDrawElement>>& drawElements)
+	: DebugDrawElement(dataPtr, name), m_DrawElements(std::move(drawElements))
+{
+}
+
+void HeaderElement::Draw()
+{
+	if (ImGui::CollapsingHeader(GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		for (int i = 0; i < m_DrawElements.size(); i++)
+		{
+			m_DrawElements[i]->Draw();
+		}
+	}
+}
+
+void HeaderElement::Push(std::unique_ptr<DebugDrawElement> element)
+{
+	m_DrawElements.push_back(std::move(element));
+}
+
+Color3Element::Color3Element(void* dataPtr, std::string name)
+	: DebugDrawElement(dataPtr, name) {}
+
+void Color3Element::Draw()
+{
+	ImGui::ColorEdit3(GetName().c_str(), (float*)GetDataPtr());
+}
+
+Color4Element::Color4Element(void* dataPtr, std::string name)
+	: DebugDrawElement(dataPtr, name) {}
+
+void Color4Element::Draw()
+{
+	ImGui::ColorEdit4(GetName().c_str(), (float*)GetDataPtr());
+}
+
+BoolElement::BoolElement(void* dataPtr, std::string name)
+	: DebugDrawElement(dataPtr, name)
+{
+}
+
+void BoolElement::Draw()
+{
+	ImGui::Checkbox(GetName().c_str(), (bool*)GetDataPtr());
+}

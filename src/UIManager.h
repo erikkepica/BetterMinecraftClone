@@ -11,19 +11,13 @@
 class DebugDrawElement
 {
 public:
-	DebugDrawElement(void* dataPtr, std::string name)
-		:m_DataPtr(dataPtr),m_Name(name)
-	{
-	}
+	DebugDrawElement(void* dataPtr, std::string name);
 
 
-	virtual void Draw()
-	{
-		return;
-	}
+	virtual void Draw();
 
-	void* GetDataPtr() { return m_DataPtr; }
-	std::string GetName() { return m_Name; }
+	void* GetDataPtr();
+	std::string GetName();
 
 private:
 	void* m_DataPtr;
@@ -36,26 +30,15 @@ private:
 	std::vector<std::unique_ptr<DebugDrawElement>> m_DrawElements;
 public:
 
-	HeaderElement(void* dataPtr, std::string name, std::vector<std::unique_ptr<DebugDrawElement>>& drawElements)
-		: DebugDrawElement(dataPtr, name), m_DrawElements(std::move(drawElements))
-	{}
-	void Draw() override 
-	{
-		if (ImGui::CollapsingHeader(GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			for (int i = 0; i < m_DrawElements.size(); i++)
-			{
-				m_DrawElements[i]->Draw();
-			}
-		}
-	} 
-	void Push(std::unique_ptr<DebugDrawElement> element) { m_DrawElements.push_back(std::move(element)); }
+	HeaderElement(void* dataPtr, std::string name, std::vector<std::unique_ptr<DebugDrawElement>>& drawElements);
+	void Draw() override;
+	void Push(std::unique_ptr<DebugDrawElement> element);
 };
 
-class Color3Element : public DebugDrawElement { public: Color3Element(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::ColorEdit3(GetName().c_str(), (float*)GetDataPtr()); } };
-class Color4Element : public DebugDrawElement { public: Color4Element(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::ColorEdit4(GetName().c_str(), (float*)GetDataPtr()); } };
+class Color3Element : public DebugDrawElement { public: Color3Element(void* dataPtr, std::string name); void Draw() override; };
+class Color4Element : public DebugDrawElement { public: Color4Element(void* dataPtr, std::string name); void Draw() override; };
 
-class BoolElement : public DebugDrawElement { public: BoolElement(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::Checkbox(GetName().c_str(), (bool*)GetDataPtr()); } };
+class BoolElement : public DebugDrawElement { public: BoolElement(void* dataPtr, std::string name); void Draw() override; };
 
 class DragFloat1ElementInf : public DebugDrawElement { public: DragFloat1ElementInf(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::DragFloat(GetName().c_str(), (float*)GetDataPtr(), 0.1f, -std::numeric_limits<float>().infinity(), std::numeric_limits<float>().infinity()); } };
 class DragFloat2ElementInf : public DebugDrawElement { public: DragFloat2ElementInf(void* dataPtr, std::string name) : DebugDrawElement(dataPtr, name) {} void Draw() override { ImGui::DragFloat2(GetName().c_str(), (float*)GetDataPtr(), 0.1f, -std::numeric_limits<float>().infinity(), std::numeric_limits<float>().infinity()); } };

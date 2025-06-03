@@ -7,42 +7,22 @@
 class EBO
 {
 public:
-    EBO()
-        :m_ID(0)
-    {
-    }
+    EBO();
 
-    void Generate(const std::vector<unsigned int>& indices)
-    {
-        GL_CALL_DEBUG(glGenBuffers(1, &m_ID));
-        Bind();
-        UpdateData(indices);
-    }
+    void Generate(const std::vector<unsigned int>& indices);
 
-    void UpdateData(const std::vector<unsigned int>& indices)
-    {
-        m_Indices = indices;
-        m_BufferData();
-    }
+    void UpdateData(const std::vector<unsigned int>& indices);
 
-    void Bind(){ GL_CALL_DEBUG(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID));}
-    static void UnBind() { GL_CALL_DEBUG(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)); }
+    void Bind();
+    static void UnBind();
 
-    unsigned int GetIndicesNum() { return m_Indices.size(); }
+    unsigned int GetIndicesNum();
 
-    ~EBO()
-    {
-        if (m_ID != 0)
-            GL_CALL_DEBUG(glDeleteBuffers(1, &m_ID));
-    }
+    ~EBO();
 private:
     unsigned int m_ID;
 
     std::vector<unsigned int> m_Indices;
 
-    void m_BufferData()
-    {
-        unsigned int* indicesArr = m_Indices.data();
-        GL_CALL_DEBUG(glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(unsigned int), indicesArr, GL_STATIC_DRAW));
-    }
+    void m_BufferData();
 };

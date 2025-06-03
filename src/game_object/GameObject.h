@@ -14,18 +14,13 @@ private:
 public:
 	std::string name;
 
-	GameObject(const char* name_)
-	{
-		Generate(name_);
-	}
-	GameObject()
-	{
-		Generate("GameObject");
-	}
+	GameObject(const char* name_);
+	GameObject();
 	~GameObject()
 	{
 	}
 
+	//returns first found component
 	template<typename T>
 	std::shared_ptr<T> GetComponent()
 	{
@@ -36,32 +31,25 @@ public:
 		}
 		return nullptr;
 	}
-
-	void Generate(std::string name_)
+	
+	//returns all found components
+	template<typename T>
+	std::vector<std::shared_ptr<T>> GetComponents()
 	{
-		name = name_;
-		PushComponent(std::make_shared<Transform>());
-	}
+		std::vector< std::shared_ptr<T>> foundComps{};
 
-	void PushComponent(std::shared_ptr<Component> component)
-	{
-		m_Components.push_back(component);
-	}
-
-	void RenderUpdate()
-	{
-		GetComponent<LitMaterial>()->Use();
-		GetComponent<Renderer>()->Draw();
-	}
-
-	void AddDebugToWindow(DebugWindow& win)
-	{
-		for (int i = 0; i < m_Components.size(); i++)
+		for (auto& comp : m_Components)
 		{
-			std::vector<std::unique_ptr<DebugDrawElement>> elems{};
-			m_Components[i]->AddDebugToDrawArray(elems);
-			std::unique_ptr<HeaderElement> header = std::make_unique<HeaderElement>(nullptr, m_Components[i]->GetID(), elems);
-			win.Push(std::move(header));
+			if (comp->GetID() == T::ID())
+				foundComps.push_back(std::dynamic_pointer_cast<T>(comp));
 		}
+		return foundComps;
 	}
+	void Generate(std::string name_);
+
+	void PushComponent(std::shared_ptr<Component> component);
+
+	void RenderUpdate();
+
+	void AddDebugToWindow(DebugWindow& win);
 };

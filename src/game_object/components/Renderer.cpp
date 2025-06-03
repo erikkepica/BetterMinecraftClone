@@ -19,7 +19,7 @@ void Renderer::Generate(std::vector<float> vertices, std::vector<unsigned int> i
 
 void Renderer::SetVertices(std::vector<float> vertices)
 {
-	m_VBO.UpdateData(vertices);
+	m_VBO.BufferData(vertices);
 }
 
 void Renderer::SetIndices(std::vector<unsigned int> indices)

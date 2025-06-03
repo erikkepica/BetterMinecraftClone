@@ -1,4 +1,14 @@
 #include"Texture.h"
+#include<string>
+#include<map>
+
+Texture::Texture()
+{
+}
+Texture::Texture(std::string path)
+{
+    Generate(path);
+}
 void Texture::Generate(std::string path)
 {
     memcpy(PathBuff, path.c_str(), path.size());
@@ -26,4 +36,54 @@ void Texture::Generate(std::string path)
         LOG_WARNING("Failed to load texture");
     }
     stbi_image_free(data);
+}
+
+void Texture::Bind(unsigned int glWhatTex)
+{
+    glActiveTexture(GL_TEXTURE0+glWhatTex);
+    glBindTexture(GL_TEXTURE_2D, m_ID);
+}
+void Texture::Bind()
+{
+    glBindTexture(GL_TEXTURE_2D, m_ID);
+}
+
+unsigned int Texture::GetID()
+{
+    return m_ID;
+}
+
+ListOpenGLTextureElements::ListOpenGLTextureElements(void* dataPtr, std::string name, int size)
+    :DebugDrawElement(dataPtr, name), size(size)
+{
+}
+
+void ListOpenGLTextureElements::Draw()
+{
+    auto texMap = static_cast<std::map<std::string, Texture>*>(GetDataPtr());
+
+    int i = 0;
+    for (auto& [name, tex] : *texMap)
+    {
+        ImGui::PushID(i);
+
+        ImGui::Text("Texture: %s", name.c_str());
+        ImGui::InputText("Location", tex.PathBuff, 128);
+
+        if (ImGui::Button("Generate Image", ImVec2(128, 32)))
+        {
+            tex.Generate(std::string(tex.PathBuff));
+        }
+
+        if (tex.GetID() != 0)
+        {
+            ImGui::Image((void*)(intptr_t)tex.GetID(), ImVec2(128, 128));
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::PopID();
+
+        ++i;
+    }
 }
