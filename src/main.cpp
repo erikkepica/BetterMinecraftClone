@@ -6,14 +6,13 @@
 
 #include"UIManager.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include"game_object/GameObject.h"
 
-#include"Logging.h"
+#include"Application/Application.h"
 
-#include<cmath>
+#include"Logging.h"
 
 void error_callback(int error, const char* description);
 
@@ -24,13 +23,68 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 /*
 TODO:
 
-	- Support for multipule of same components on one GameObject( or prohibition )
 	- Abstracting window and application logic away
-	- Putting code from headers to cpps 
 	- Making the game engine a library
 */
+glm::vec3 camPos(0.0f);
+glm::vec3 camRot(0.0f); // pitch (x), yaw (y), roll (z)
 
+float camSpeed = 5.0f;
+float mouseSensitivity = 0.1f;
 
+// Track time and mouse state
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+void updateCamera(GLFWwindow* window, float deltaTime) {
+	// Mouse movement
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	if (firstMouse) {
+		lastX = (float)xpos;
+		lastY = (float)ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = (float)(xpos - lastX);
+	float yoffset = (float)(lastY - ypos); // reversed Y
+
+	lastX = (float)xpos;
+	lastY = (float)ypos;
+
+	camRot.y += xoffset * mouseSensitivity;
+	camRot.x += yoffset * mouseSensitivity;
+
+	// Clamp pitch
+	if (camRot.x > 89.0f) camRot.x = 89.0f;
+	if (camRot.x < -89.0f) camRot.x = -89.0f;
+
+	// Calculate direction vectors
+	glm::vec3 front;
+	front.x = cos(glm::radians(camRot.y)) * cos(glm::radians(camRot.x));
+	front.y = sin(glm::radians(camRot.x));
+	front.z = sin(glm::radians(camRot.y)) * cos(glm::radians(camRot.x));
+	front = glm::normalize(front);
+
+	glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
+	glm::vec3 up = glm::vec3(0,1,0);
+
+	float velocity = camSpeed * deltaTime;
+
+	// Movement keys
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camPos += front * velocity;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camPos -= front * velocity;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camPos -= right * velocity;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camPos += right * velocity;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camPos += up * velocity;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camPos -= up * velocity;
+}
 
 
 int main()
@@ -51,33 +105,12 @@ int main()
 	LOG_WARNING("This is an example for warning logging!");
 	LOG_ERROR("This is an example for error logging!", false);
 
-	if (!glfwInit())
-	{
-		LOG_ERROR("GLFW: Failed to initialize", true);
-	}
-	LOG_INFO("GLFW: Initialized");
-	glfwSetErrorCallback(error_callback);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	Application app({ "Game", {"Game", 800, 600}});
+	app.window.SetKeyCallback(key_callback);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
-	if (!window)
-	{
-		LOG_ERROR("GLFW: Window failed to create", true);
-	}
-	LOG_INFO("GLFW: Window opened");
-
-	glfwSetKeyCallback(window, key_callback);
-
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		LOG_ERROR("GLAD: Failed to initialize", true);
-	}
-	LOG_INFO("GLAD: Initialized");
 	
+
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -163,7 +196,7 @@ int main()
 
 	const unsigned int X_SEGMENTS = 64;
 	const unsigned int Y_SEGMENTS = 64;
-	float M_PI = 3.14159265359f;
+	float M_PI = 3.14f;
 	std::vector<unsigned int> sphereIndices;
 
 	struct Vertex {
@@ -301,9 +334,6 @@ int main()
 	float ambientStrength = 0.07f;
 	float lightStrength = 3.0f;
 
-	UIManager uiManager;
-	uiManager.Init(window);
-
 
 	DebugWindow enviromentWindow("Enviroment", ImGuiWindowFlags_None);
 	enviromentWindow.Push(std::make_unique<Color3Element>(bgColor, "Background Color"));
@@ -312,56 +342,69 @@ int main()
 	enviromentWindow.Push(std::make_unique<DragFloat1ElementInf>(&lightStrength, "Light Strength"));
 	enviromentWindow.Push(std::make_unique<DragFloat1ElementInf>(&ambientStrength, "Ambient Strength"));
 
+	DebugWindow cameraInfo("Camera Info", ImGuiWindowFlags_None);
+	cameraInfo.Push(std::make_unique<DragFloat3ElementInf>(&camPos[0], "Camera Position"));
+	cameraInfo.Push(std::make_unique<DragFloat3ElementRange>(&camRot[0], "Camera Rotation", -360, 360));
 
-	DebugWindow squareWindow("Square", ImGuiWindowFlags_None);
+	DebugWindow squareWindow("Game Object", ImGuiWindowFlags_None);
 
 	cube.AddDebugToWindow(squareWindow);
 
 
 
-	uiManager.Push(&enviromentWindow);
-	uiManager.Push(&squareWindow);
+	app.uiManager.Push(&enviromentWindow);
+	app.uiManager.Push(&squareWindow);
+	app.uiManager.Push(&cameraInfo);
 
+	glfwSetInputMode(app.window.GetGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	bool enable = true;
-	while (!glfwWindowShouldClose(window))
+	float lastTime = 0;
+
+	bool fpsMode = true;
+	bool togglePressed = false;
+
+	while (!glfwWindowShouldClose(app.window.GetGLFWWindow()))
 	{
+		if (glfwGetKey(app.window.GetGLFWWindow(), GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
+			if (!togglePressed) {
+				fpsMode = !fpsMode;
+				glfwSetInputMode(app.window.GetGLFWWindow(), GLFW_CURSOR, fpsMode ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+				togglePressed = true;
+			}
+		}
+		else {
+			togglePressed = false;
+		}
+
+		float currentTime = (float)glfwGetTime();
+		float deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
 		glfwPollEvents();
 
 		int width, height;
 
-		glfwGetFramebufferSize(window, &width, &height);
-
-		glm::mat4 model(1);
-		model = glm::rotate(model, glm::radians(cube.GetComponent<Transform>()->rotation.x), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(cube.GetComponent<Transform>()->rotation.y), glm::vec3(0, 1, 0));
-		model = glm::rotate(model, glm::radians(cube.GetComponent<Transform>()->rotation.z), glm::vec3(0, 0, 1));
-		model = glm::scale(model, cube.GetComponent<Transform>()->scale);
-
-		glm::mat4 view(1);
-		view = glm::translate(view, cube.GetComponent<Transform>()->position);
+		glfwGetFramebufferSize(app.window.GetGLFWWindow(), &width, &height);
+		if(fpsMode)
+			updateCamera(app.window.GetGLFWWindow(), deltaTime);
 
 		glm::mat4 projection(1);
-		projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.01f, 100.0f);
+		projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.01f, 3000.0f);
 
 		glViewport(0, 0, width, height);
 		glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		cube.GetComponent<LitMaterial>()->SetupMatricies(cube.GetComponent<Transform>()->GetModel(), cube.GetComponent<Transform>()->GetView(-camPos,camRot), projection);
 		cube.GetComponent<LitMaterial>()->shader.SetFloat("time", glfwGetTime());
-		cube.GetComponent<LitMaterial>()->SetupMatricies(model, view, projection);
 		cube.GetComponent<LitMaterial>()->SetupLighting(lightColor, lightDir, lightStrength, ambientStrength);
+		cube.GetComponent<LitMaterial>()->shader.SetVec3("viewPos", -camPos);
 		cube.RenderUpdate();
 
-		uiManager.Draw();
+		app.uiManager.Draw();
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(app.window.GetGLFWWindow());
 	}
-
-
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	return 0;
+	app.Shutdown();
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -370,7 +413,3 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-void error_callback(int error, const char* description)
-{
-	LOG_ERROR("GLFW: " << error << ", " << description, false);
-}

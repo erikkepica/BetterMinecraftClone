@@ -15,21 +15,21 @@ void Texture::Generate(std::string path)
 
     stbi_set_flip_vertically_on_load(true);
 
-    glGenTextures(1, &m_ID);
+    GL_CALL_DEBUG(glGenTextures(1, &m_ID));
     Bind();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    GL_CALL_DEBUG_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+    GL_CALL_DEBUG_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GL_CALL_DEBUG_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    GL_CALL_DEBUG_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
 
     int width, height, nrChannels;
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        GL_CALL_DEBUG_ERR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
+        GL_CALL_DEBUG_ERR(glGenerateMipmap(GL_TEXTURE_2D));
     }
     else
     {
@@ -40,12 +40,12 @@ void Texture::Generate(std::string path)
 
 void Texture::Bind(unsigned int glWhatTex)
 {
-    glActiveTexture(GL_TEXTURE0+glWhatTex);
-    glBindTexture(GL_TEXTURE_2D, m_ID);
+    GL_CALL_DEBUG(glActiveTexture(GL_TEXTURE0+glWhatTex));
+    GL_CALL_DEBUG_ERR(glBindTexture(GL_TEXTURE_2D, m_ID));
 }
 void Texture::Bind()
 {
-    glBindTexture(GL_TEXTURE_2D, m_ID);
+    GL_CALL_DEBUG(glBindTexture(GL_TEXTURE_2D, m_ID));
 }
 
 unsigned int Texture::GetID()

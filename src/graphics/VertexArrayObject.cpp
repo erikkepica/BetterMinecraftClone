@@ -14,7 +14,7 @@ void VertexBufferLayout::SetAttributes()
 	for (int i = 0; i < m_Elements.size(); i++)
 	{
 		GL_CALL_DEBUG(glVertexAttribPointer(i, m_Elements.at(i).count, m_Elements.at(i).type, m_Elements.at(i).normalized, m_Stride, (void*)m_Elements.at(i).offset));
-		glEnableVertexAttribArray(i);
+		GL_CALL_DEBUG_ERR(glEnableVertexAttribArray(i));
 	}
 }
 

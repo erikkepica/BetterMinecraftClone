@@ -26,11 +26,12 @@ uniform vec3 lightColor;
 uniform vec3 lightDir; // Direction *toward* the light
 uniform float lightStrength;
 
+uniform vec3 viewPos;
+
 uniform float time;
 
 void main()
 {
-    vec3 viewPos = vec3(0, 0, 5);
 
     // Texture + color
     vec3 baseColor = texture(earth, uv).rgb;

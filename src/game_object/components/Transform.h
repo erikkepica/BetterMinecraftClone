@@ -14,4 +14,7 @@ public:
 	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override;
 	static std::string ID() { return "TRANSFORM"; }
 	virtual std::string GetID() override { return ID(); }
+
+	glm::mat4 GetModel();
+	glm::mat4 GetView(glm::vec3 camPos, glm::vec3 camRot);
 };

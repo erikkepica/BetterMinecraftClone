@@ -116,12 +116,9 @@ private:
 	std::vector<DebugWindow*> m_DebugWindows;
 public:
 	UIManager(){}
-	~UIManager()
-	{
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-	}
+	UIManager(GLFWwindow* window);
+
+	void Shutdown();
 
 	void Draw();
 

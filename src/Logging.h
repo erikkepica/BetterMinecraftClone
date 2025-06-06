@@ -14,6 +14,9 @@
 #ifndef GL_CALL_DEBUG(x)
 #define GL_CALL_DEBUG(x) x; auto err = glGetError(); if(err!=0){LOG_ERROR(err, false);}
 #endif
+#ifndef GL_CALL_DEBUG_ERR(x)
+#define GL_CALL_DEBUG_ERR(x) x; err = glGetError(); if(err!=0){LOG_ERROR(err, false);}
+#endif
 #ifndef GL_CALL_DEBUG_STOPPING(x)
 #define GL_CALL_DEBUG_STOPPING(x) x; if(glGetError()!=0){LOG_ERROR(glGetError(), true);}
 #endif

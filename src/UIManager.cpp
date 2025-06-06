@@ -25,6 +25,18 @@ void UIManager::Init(GLFWwindow* window)
 	LOG_INFO("Initialized IMGUI");
 }
 
+UIManager::UIManager(GLFWwindow* window)
+{
+	Init(window);
+}
+
+void UIManager::Shutdown()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
 void UIManager::Draw()
 {
 	ImGui_ImplOpenGL3_NewFrame();
