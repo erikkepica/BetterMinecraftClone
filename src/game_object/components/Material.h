@@ -81,22 +81,22 @@ public:
 
 	glm::vec4 color = glm::vec4(1);
 	glm::vec3 lightColor;
+	glm::vec3 ambientColor;
 	glm::vec3 lightPos;
 	float lightStrength;
 	float ambientStrength;
 	float shininess = 32;
 	float specularStrength = 0.5f;
 	float normalIntensity = 1;
-	float waveStrength = .2;
-	float waveSpeed = .05;
-	float waveSize = 32;
+
 	
-	void SetupLighting(glm::vec3 lightColor_, glm::vec3 lightPos_, float lightStrength_, float ambientStrength_)
+	void SetupLighting(glm::vec3 lightColor_, glm::vec3 lightPos_, float lightStrength_, float ambientStrength_, glm::vec3 ambientColor_)
 	{
 		lightColor = lightColor_;
 		lightPos = lightPos_;
 		lightStrength = lightStrength_;
 		ambientStrength = ambientStrength_;
+		ambientColor = ambientColor_;
 	}
 
 	virtual void ConfigureUniforms() override
@@ -104,15 +104,14 @@ public:
 		Material::ConfigureUniforms();
 		shader.SetVec4("col", color);
 		shader.SetVec3("lightColor", lightColor);
+		shader.SetVec3("ambientColor", ambientColor);
 		shader.SetVec3("lightDir", lightPos);
 		shader.SetFloat("ambientStrength", ambientStrength);
 		shader.SetFloat("lightStrength", lightStrength);
 		shader.SetFloat("shininess", shininess);
 		shader.SetFloat("specularStrength", specularStrength);
 		shader.SetFloat("normalIntensity", normalIntensity);
-		shader.SetFloat("waveStrength", waveStrength);
-		shader.SetFloat("waveSpeed", waveSpeed);
-		shader.SetFloat("waveSize", waveSize);
+
 	}
 
 	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override
@@ -122,8 +121,5 @@ public:
 		win.push_back(std::make_unique<DragFloat1ElementInf>(&shininess, "Specular Shininess"));
 		win.push_back(std::make_unique<DragFloat1ElementInf>(&specularStrength, "Specular Strength"));
 		win.push_back(std::make_unique<DragFloat1ElementInf>(&normalIntensity, "Normal Intensity"));
-		win.push_back(std::make_unique<DragFloat1ElementInf>(&waveStrength, "waveStrength"));
-		win.push_back(std::make_unique<DragFloat1ElementInf>(&waveSpeed, "waveSpeed"));
-		win.push_back(std::make_unique<DragFloat1ElementInf>(&waveSize, "waveSize"));
 	}
 };

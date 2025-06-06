@@ -4,9 +4,11 @@
 
 class Model
 {
-	Model();
 
 public:
+	Model(VertexBufferLayout attribs);
+	void LoadOBJ(const char* path);
+
 	std::vector<float> GetVertices();
 	std::vector<unsigned int> GetIndices();
 	VertexBufferLayout GetAttributes();

@@ -33,7 +33,7 @@ void Texture::Generate(std::string path)
     }
     else
     {
-        LOG_WARNING("Failed to load texture");
+        LOG_WARNING("TEXTURE: Failed to load texture: " << path);
     }
     stbi_image_free(data);
 }
