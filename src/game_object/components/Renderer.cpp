@@ -5,6 +5,11 @@ Renderer::Renderer(std::vector<float> vertices, std::vector<unsigned int> indice
 	Generate(vertices, indices, attribs);
 }
 
+Renderer::Renderer(Model model)
+{
+	Generate(model.GetVertices(), model.GetIndices(), model.GetAttributes());
+}
+
 void Renderer::Generate(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs)
 {
 	m_VAO.Generate();
@@ -25,6 +30,10 @@ void Renderer::SetVertices(std::vector<float> vertices)
 void Renderer::SetIndices(std::vector<unsigned int> indices)
 {
 	m_EBO.UpdateData(indices);
+}
+
+void Renderer::SetModel(Model model)
+{
 }
 
 void Renderer::Draw()

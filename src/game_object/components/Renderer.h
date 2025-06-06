@@ -3,6 +3,7 @@
 #include"graphics/VertexBufferObject.h"
 #include"graphics/ElementBufferObject.h"
 #include"Component.h"
+#include"game_object/Model.h"
 
 class Renderer : public Component
 {
@@ -15,6 +16,7 @@ public:
 	{
 	}
 	Renderer(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs);
+	Renderer(Model model);
 	~Renderer(){}
 
 	void Generate(std::vector<float> vertices, std::vector<unsigned int> indices, VertexBufferLayout& attribs);
@@ -22,6 +24,8 @@ public:
 	void SetVertices(std::vector<float> vertices);
 	
 	void SetIndices(std::vector<unsigned int> indices);
+
+	void SetModel(Model model);
 
 	void Draw();
 
