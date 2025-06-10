@@ -20,14 +20,6 @@ void error_callback(int error, const char* description);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-
-
-/*
-TODO:
-
-	- Abstracting window and application logic away
-	- Making the game engine a library
-*/
 glm::vec3 camPos(0.0f);
 glm::vec3 camRot(0.0f); // pitch (x), yaw (y), roll (z)
 
@@ -137,7 +129,7 @@ int main()
 	{
 		{"diffuseSample",Texture(RESOURCES_PATH "CarDiffuse.png")},
 		{"specularSample",Texture(RESOURCES_PATH "SpecularAll.png")},
-		{"normalSampler",Texture(RESOURCES_PATH "")},
+		{"normalSampler",Texture("")},
 	}));
 
 

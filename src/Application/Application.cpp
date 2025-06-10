@@ -47,3 +47,6 @@ void Application::Shutdown()
 	glfwTerminate();
 }
 
+void Application::Run()
+{
+}

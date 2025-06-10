@@ -54,7 +54,7 @@ add_subdirectory(thirdparty/imgui-docking)		#ui
 
 add_executable("${CMAKE_PROJECT_NAME}")
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/graphics/VertexArrayObject.cpp" "src/game_object/components/Material.cpp" "src/Application/Application.h" "src/Application/Application.cpp" "src/Application/Window.h" "src/Application/Window.cpp" "src/Application/DataStructs.h" "src/Application/DataStructs.cpp" "src/game_object/Model.h" "src/game_object/Model.cpp")
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/graphics/VertexArrayObject.cpp" "src/game_object/components/Material.cpp" "src/Application/Application.h" "src/Application/Application.cpp" "src/Application/Window.h" "src/Application/Window.cpp" "src/Application/DataStructs.h" "src/Application/DataStructs.cpp" "src/game_object/Model.h" "src/game_object/Model.cpp" "src/game_object/components/Component.cpp" "src/game_object/Scene.h")
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/graphics/VertexBufferObject.cpp")
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/graphics/ShaderClass.cpp")
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/graphics/ElementBufferObject.cpp")

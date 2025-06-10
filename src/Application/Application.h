@@ -19,5 +19,7 @@ public:
 	void InitGLAD();
 
 	void Shutdown();
+
+	void Run();
 private:
 };
