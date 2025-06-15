@@ -62,7 +62,7 @@ void main()
     vec3 specular = specMapVal * spec * lightColor;
 
     vec3 result = (ambient + diffuse + specular) * objectColor;
-    if(baseColor.a != 1)
+    if(baseColor.a < 0.5)
     {
         discard;
     }

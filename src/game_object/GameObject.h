@@ -12,6 +12,7 @@ class GameObject
 private:
 	std::vector<std::shared_ptr<Component>> m_Components;
 public:
+	std::shared_ptr<Transform> transform;
 	std::string name;
 
 	GameObject(const char* name_);

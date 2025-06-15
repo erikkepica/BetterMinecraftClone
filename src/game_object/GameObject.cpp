@@ -13,7 +13,8 @@ GameObject::GameObject()
 void GameObject::Generate(std::string name_)
 {
 	name = name_;
-	PushComponent(std::make_shared<Transform>());
+	transform = std::make_shared<Transform>();
+	PushComponent(transform);
 }
 
 void GameObject::PushComponent(std::shared_ptr<Component> component)

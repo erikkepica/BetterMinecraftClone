@@ -118,18 +118,17 @@ int main()
 
 
 	Model model(attribs);
-	model.LoadOBJ(RESOURCES_PATH "Car.obj");
+	model.LoadOBJ(RESOURCES_PATH "chicken/Chicken.obj");
 
 	GameObject cube;
-	Renderer renderer;
 	cube.PushComponent(std::make_shared<Renderer>(model));
 
 
 	cube.PushComponent(std::make_shared<LitMaterial>(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::map<std::string, Texture>
 	{
-		{"diffuseSample",Texture(RESOURCES_PATH "CarDiffuse.png")},
+		{"diffuseSample",Texture(RESOURCES_PATH "chicken/textures/diffuse.png")},
 		{"specularSample",Texture(RESOURCES_PATH "SpecularAll.png")},
-		{"normalSampler",Texture("")},
+		{"normalSampler",Texture(RESOURCES_PATH "chicken/textures/normal.png")},
 	}));
 
 
