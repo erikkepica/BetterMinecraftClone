@@ -60,6 +60,7 @@ ListOpenGLTextureElements::ListOpenGLTextureElements(void* dataPtr, std::string 
 
 void ListOpenGLTextureElements::Draw()
 {
+    DebugDrawElement::Draw();
     auto texMap = static_cast<std::map<std::string, Texture>*>(GetDataPtr());
 
     int i = 0;

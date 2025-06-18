@@ -16,6 +16,8 @@
 
 #include"game_object/Model.h"
 
+#include"game_object/components/Camera.h"
+
 void error_callback(int error, const char* description);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -132,6 +134,9 @@ int main()
 	}));
 
 
+	GameObject camera;
+	camera.PushComponent(std::make_shared<Camera>(camera.transform, app.window.data));
+
 
 	float bgColor[]{.3,.5,1};
 	glm::vec3 lightColor(1, 1, 1);
@@ -154,14 +159,17 @@ int main()
 	cameraInfo.Push(std::make_unique<DragFloat3ElementRange>(&camRot[0], "Camera Rotation", -360, 360));
 
 	DebugWindow squareWindow("Game Object", ImGuiWindowFlags_None);
+	DebugWindow cameraWindow("Camera", ImGuiWindowFlags_None);
 
 	cube.AddDebugToWindow(squareWindow);
+	camera.AddDebugToWindow(cameraWindow);
 
 
 
 	app.uiManager.Push(&enviromentWindow);
 	app.uiManager.Push(&squareWindow);
 	app.uiManager.Push(&cameraInfo);
+	app.uiManager.Push(&cameraWindow);
 
 	glfwSetInputMode(app.window.GetGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -195,14 +203,13 @@ int main()
 		if(fpsMode)
 			updateCamera(app.window.GetGLFWWindow(), deltaTime);
 
-		glm::mat4 projection(1);
-		projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.01f, 3000.0f);
-
 		glViewport(0, 0, width, height);
 		glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		cube.GetComponent<LitMaterial>()->SetupMatricies(cube.GetComponent<Transform>()->GetModel(), cube.GetComponent<Transform>()->GetView(-camPos,camRot), projection);
+		camera.GetComponent<Camera>()->UpdateWindowData(app.window.data);
+
+		cube.GetComponent<LitMaterial>()->SetupMatricies(cube.GetComponent<Transform>()->GetModel(), cube.GetComponent<Transform>()->GetView(-camPos,camRot), camera.GetComponent<Camera>()->GetProjection());
 		cube.GetComponent<LitMaterial>()->shader.SetFloat("time", glfwGetTime());
 		cube.GetComponent<LitMaterial>()->SetupLighting(lightColor, lightDir, lightStrength, ambientStrength, ambientColor);
 		cube.GetComponent<LitMaterial>()->shader.SetVec3("viewPos", -camPos);

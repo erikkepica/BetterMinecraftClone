@@ -52,11 +52,25 @@ void UIManager::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void DebugWindow::Clear()
+{
+	m_DrawElements.clear();
+}
+
 void DebugWindow::Draw()
 {
+
 	ImGui::Begin(m_Name.c_str(), &m_Enabled, ImGuiWindowFlags_MenuBar);
 	for (int i = 0; i < m_DrawElements.size(); i++)
 	{
+		if (m_DrawElements[i]->change.Poll())
+		{
+			change.Induce(this);
+			if (change.Poll())
+			{
+				LOG_INFO("POLL");
+			}
+		}
 		m_DrawElements[i]->Draw();
 	}
 	ImGui::End();
@@ -69,7 +83,6 @@ DebugDrawElement::DebugDrawElement(void* dataPtr, std::string name)
 
 void DebugDrawElement::Draw()
 {
-	return;
 }
 
 void* DebugDrawElement::GetDataPtr()
@@ -93,6 +106,10 @@ void HeaderElement::Draw()
 	{
 		for (int i = 0; i < m_DrawElements.size(); i++)
 		{
+			if (m_DrawElements[i]->change.Poll())
+			{
+				change.Induce(this);
+			}
 			m_DrawElements[i]->Draw();
 		}
 	}
@@ -108,7 +125,9 @@ Color3Element::Color3Element(void* dataPtr, std::string name)
 
 void Color3Element::Draw()
 {
-	ImGui::ColorEdit3(GetName().c_str(), (float*)GetDataPtr());
+	DebugDrawElement::Draw();
+
+	if(ImGui::ColorEdit3(GetName().c_str(), (float*)GetDataPtr())){ change.Induce(this); }
 }
 
 Color4Element::Color4Element(void* dataPtr, std::string name)
@@ -116,7 +135,9 @@ Color4Element::Color4Element(void* dataPtr, std::string name)
 
 void Color4Element::Draw()
 {
-	ImGui::ColorEdit4(GetName().c_str(), (float*)GetDataPtr());
+	DebugDrawElement::Draw();
+
+	if(ImGui::ColorEdit4(GetName().c_str(), (float*)GetDataPtr())){ change.Induce(this); }
 }
 
 BoolElement::BoolElement(void* dataPtr, std::string name)
@@ -126,5 +147,7 @@ BoolElement::BoolElement(void* dataPtr, std::string name)
 
 void BoolElement::Draw()
 {
-	ImGui::Checkbox(GetName().c_str(), (bool*)GetDataPtr());
+	DebugDrawElement::Draw();
+
+	if(ImGui::Checkbox(GetName().c_str(), (bool*)GetDataPtr())){ change.Induce(this); }
 }
