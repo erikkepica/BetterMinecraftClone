@@ -8,4 +8,5 @@ public:
 	virtual std::string GetID() { return "NONE"; }
 	virtual void Update();
 	virtual void Start();
+	virtual std::string GetPass() { return "NONE"; }
 };

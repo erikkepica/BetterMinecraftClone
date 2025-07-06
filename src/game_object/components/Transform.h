@@ -17,4 +17,5 @@ public:
 
 	glm::mat4 GetModel();
 	glm::mat4 GetView(glm::vec3 camPos, glm::vec3 camRot);
+	virtual std::string GetPass() override { return "UPDATE"; }
 };

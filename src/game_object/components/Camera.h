@@ -32,4 +32,5 @@ public:
 	virtual void AddDebugToDrawArray(std::vector<std::unique_ptr<DebugDrawElement>>& win) override;
 	static std::string ID() { return "CAMERA"; }
 	virtual std::string GetID() override { return ID(); }
+	virtual std::string GetPass() override { return "UPDATE"; }
 };

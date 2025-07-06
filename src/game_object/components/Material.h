@@ -68,6 +68,7 @@ public:
 	}
 	static std::string ID() { return "MATERIAL"; }
 	virtual std::string GetID() override { return ID(); }
+	virtual std::string GetPass() override { return "RENDER"; }
 };
 
 

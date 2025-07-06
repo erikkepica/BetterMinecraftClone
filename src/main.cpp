@@ -18,6 +18,8 @@
 
 #include"game_object/components/Camera.h"
 
+#include"game_object/Scene.h"
+
 void error_callback(int error, const char* description);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -110,6 +112,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	Scene scene0;
 
 	VertexBufferLayout attribs;
 	attribs.Push<float>(3);
@@ -122,11 +125,11 @@ int main()
 	Model model(attribs);
 	model.LoadOBJ(RESOURCES_PATH "chicken/Chicken.obj");
 
-	GameObject cube;
-	cube.PushComponent(std::make_shared<Renderer>(model));
+	scene0.PushGameObject(std::make_shared<GameObject>("Chicken"));
+	scene0.GetGameObject("Chicken")->PushComponent(std::make_shared<Renderer>(model));
 
 
-	cube.PushComponent(std::make_shared<LitMaterial>(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::map<std::string, Texture>
+	scene0.GetGameObject("Chicken")->PushComponent(std::make_shared<LitMaterial>(RESOURCES_PATH "vert.vert", RESOURCES_PATH "frag.frag", std::map<std::string, Texture>
 	{
 		{"diffuseSample",Texture(RESOURCES_PATH "chicken/textures/diffuse.png")},
 		{"specularSample",Texture(RESOURCES_PATH "SpecularAll.png")},
@@ -134,25 +137,16 @@ int main()
 	}));
 
 
-	GameObject camera;
-	camera.PushComponent(std::make_shared<Camera>(camera.transform, app.window.data));
+	scene0.PushGameObject(std::make_shared<GameObject>("Camera"));
+	scene0.GetGameObject("Camera")->PushComponent(std::make_shared<Camera>(scene0.GetGameObject("Camera")->transform, app.window.data));
+	scene0.mainCamera = scene0.GetGameObject("Camera");
 
 
-	float bgColor[]{.3,.5,1};
-	glm::vec3 lightColor(1, 1, 1);
-	glm::vec3 ambientColor(1, 1, 1);
-	glm::vec3 lightDir(1, -1, -1);
-	float ambientStrength = 0.37f;
-	float lightStrength = 1.0f;
+
 
 
 	DebugWindow enviromentWindow("Enviroment", ImGuiWindowFlags_None);
-	enviromentWindow.Push(std::make_unique<Color3Element>(bgColor, "Background Color"));
-	enviromentWindow.Push(std::make_unique<Color3Element>(&lightColor[0], "Light Color"));
-	enviromentWindow.Push(std::make_unique<Color3Element>(&ambientColor[0], "Ambient Color"));
-	enviromentWindow.Push(std::make_unique<DragFloat3ElementInf>(&lightDir[0], "Light Dir"));
-	enviromentWindow.Push(std::make_unique<DragFloat1ElementInf>(&lightStrength, "Light Strength"));
-	enviromentWindow.Push(std::make_unique<DragFloat1ElementInf>(&ambientStrength, "Ambient Strength"));
+	scene0.enviroment.AddDebugToWindow(enviromentWindow);
 
 	DebugWindow cameraInfo("Camera Info", ImGuiWindowFlags_None);
 	cameraInfo.Push(std::make_unique<DragFloat3ElementInf>(&camPos[0], "Camera Position"));
@@ -161,8 +155,8 @@ int main()
 	DebugWindow squareWindow("Game Object", ImGuiWindowFlags_None);
 	DebugWindow cameraWindow("Camera", ImGuiWindowFlags_None);
 
-	cube.AddDebugToWindow(squareWindow);
-	camera.AddDebugToWindow(cameraWindow);
+	scene0.GetGameObject("Chicken")->AddDebugToWindow(squareWindow);
+	scene0.GetGameObject("Camera")->AddDebugToWindow(cameraWindow);
 
 
 
@@ -203,17 +197,16 @@ int main()
 		if(fpsMode)
 			updateCamera(app.window.GetGLFWWindow(), deltaTime);
 
+		scene0.GetGameObject("Camera")->transform->position = camPos;
+		scene0.GetGameObject("Camera")->transform->rotation = camRot;
+
 		glViewport(0, 0, width, height);
-		glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
+		glClearColor(scene0.enviroment.bgColor[0], scene0.enviroment.bgColor[1], scene0.enviroment.bgColor[2], 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.GetComponent<Camera>()->UpdateWindowData(app.window.data);
+		scene0.GetGameObject("Camera")->GetComponent<Camera>()->UpdateWindowData(app.window.data);
 
-		cube.GetComponent<LitMaterial>()->SetupMatricies(cube.GetComponent<Transform>()->GetModel(), cube.GetComponent<Transform>()->GetView(-camPos,camRot), camera.GetComponent<Camera>()->GetProjection());
-		cube.GetComponent<LitMaterial>()->shader.SetFloat("time", glfwGetTime());
-		cube.GetComponent<LitMaterial>()->SetupLighting(lightColor, lightDir, lightStrength, ambientStrength, ambientColor);
-		cube.GetComponent<LitMaterial>()->shader.SetVec3("viewPos", -camPos);
-		cube.RenderUpdate();
+		scene0.Render();
 
 		app.uiManager.Draw();
 
@@ -224,6 +217,7 @@ int main()
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 }

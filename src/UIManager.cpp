@@ -11,7 +11,6 @@ void UIManager::Init(GLFWwindow* window)
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-
 	if (!ImGui_ImplGlfw_InitForOpenGL(window, true))
 	{
 		LOG_ERROR("IMGUI: Failed to init glfw for imgui", true);
@@ -23,6 +22,7 @@ void UIManager::Init(GLFWwindow* window)
 		return;
 	}
 	LOG_INFO("Initialized IMGUI");
+
 }
 
 UIManager::UIManager(GLFWwindow* window)
@@ -42,6 +42,7 @@ void UIManager::Draw()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+
 
 	for (auto win : m_DebugWindows)
 	{
